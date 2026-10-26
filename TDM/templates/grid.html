@@ -1,0 +1,29 @@
+  <div class="button-group">
+                    <button id="addrecord" onclick="dataform({{ table_id }})">Add New Record</button>
+                    <button type="button" onclick="uploaddata({{ table_id }})" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Upload Data</button>
+                    <button id="downloaddata" onclick="downloaddata({{ table_id }})">Download Data</button>
+  </div>
+    <table id="data-grid">
+        <thead>
+            <tr>
+                {% for header in headers %}
+                    <th>{{ header }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody id="data-list">
+            {% for row in rows %}
+                <tr>
+                    {% for value in row %}
+                        <td>{{ value }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+
+
+
+

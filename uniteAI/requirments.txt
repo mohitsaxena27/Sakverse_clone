@@ -1,0 +1,21 @@
+langchain
+langchain-anthropic
+requests
+langchain-ollama
+playwright
+langchain-community
+fastapi
+# API
+pydantic>=2.5.0
+# Database
+sqlalchemy>=2.0.25
+pymysql>=1.1.0
+langchain-core
+langchain-community
+reportlab
+docker
+uvicorn
+websockets
+xlwt
+pypdf
+Pillow

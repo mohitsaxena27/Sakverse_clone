@@ -1,0 +1,23 @@
+# requirements.txt
+fastapi~=0.116.0
+uvicorn
+chromadb~=1.0.15
+sentence-transformers~=5.0.0
+pydantic~=2.11.7
+pdfplumber
+pandas
+docx
+markdown
+tiktoken
+python-docx
+pillow
+matplotlib
+langchain_text_splitters
+langgraph
+mysql-connector-python~=8.3.0
+openpyxl
+html2text
+pyjwt~=2.10.1
+openai~=1.77.0
+json-repair
+lxml

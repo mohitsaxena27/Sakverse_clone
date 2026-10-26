@@ -1,0 +1,9 @@
+MCP_BASE_URL = "http://localhost:3333"
+# LLM_MODEL = "claude-sonnet-4-5-20250929"
+LLM_MODEL = "gpt-oss:20b"
+OLLAMA_API_KEY="34dddee663334380b55448af3f586b78.j4IPZ-9emQRkfOHxFPkWSuCA"
+#LLM_MODEL = "gpt-oss:120b-cloud"
+OLLAMA_BASE_URL = "https://ollama.com/v1/"
+HEADLESS = False
+SCREENSHOT_DIR = "screenshots"
+MAX_DOM_CHARS = 80000000

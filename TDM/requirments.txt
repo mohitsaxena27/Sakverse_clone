@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+SQLAlchemy
+python-dotenv
+mysql-connector-python
+jsonschema
+pandas
+requests
+openpyxl
+python-multipart

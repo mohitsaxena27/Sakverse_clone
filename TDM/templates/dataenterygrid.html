@@ -1,0 +1,21 @@
+
+    <table id="data-grid">
+        <thead>
+            <tr>
+                {% for header in headers %}
+                    <th>{{ header }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody id="dataform">
+                <tr>
+                    {% for header in headers %}
+                        <td><input type="text" name="{{ header }}"></td>
+                    {% endfor %}
+                </tr>
+
+        </tbody>
+    </table>
+    <button id="addrecord" onclick="submitData({{ table_id }})">Add New Record</button>
+
+

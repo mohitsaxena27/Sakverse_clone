@@ -1,0 +1,199 @@
+version: '3.9'
+
+services:
+
+ # -----------------------------
+ # 2️⃣ Auth Service (Spring Boot)
+  # -----------------------------
+  auth:
+    image: sakverse/authservice:latest
+    pull_policy: always
+    container_name: auth-service
+    ports:
+      - "8090:8090"
+    restart: unless-stopped
+    environment:
+      # --- Database Configuration ---
+      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/authservice
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: admin
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+      SPRING_JPA_SHOW_SQL: true
+
+      # --- File Upload Configuration ---
+      SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE: 200MB
+      SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE: 200MB
+      SERVER_TOMCAT_MAX_HTTP_POST_SIZE: 209715200   # in bytes (200MB)
+      SERVER_TOMCAT_MAX_SWALLOW_SIZE: 209715200
+
+      # --- Application Settings ---
+      JWT_SECRET: mySecretKeymySecretKeymySecretKeymySecretKey
+      JWT_EXPIRATION: 86400000
+      THIRDPARTY_API_URL: http://knowledgemaster:4444/ingest
+      SERVER_PORT: 8090
+      FILE_STORAGE_BASE_PATH: /host_storage
+
+    volumes:
+      - C:\Knowledge_Data:/host_storage
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8090/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # -----------------------------
+  # 3️⃣ Knowledge Master Service (Python)
+  # -----------------------------
+  knowledgemaster:
+    image: sakverse/knowledgemaster:latest
+    pull_policy: always
+    container_name: knowledgemaster
+    ports:
+      - "4444:4444"
+    restart: unless-stopped
+    depends_on:
+      - auth
+    environment:
+      AUTH_URL: "http://auth:8090"
+      CHROMA_DIR: "/app/chroma_storage"
+      KNOWLEDGE_DATA_DIR: "/mnt/Knowledge_Data"
+      DB_host: "host.docker.internal"
+      DB_user: "root"
+      DB_password: "admin"
+      DB_database: "authservice"
+      DB_port: "3306"
+      SECRET_KEY: "mySecretKeymySecretKeymySecretKeymySecretKey"
+      ALGORITHM: "HS256"
+    volumes:
+      - C:\Knowledge_Data:/mnt/Knowledge_Data
+      - C:\ChromaStore:/app/chroma_storage
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4444/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # -----------------------------
+  # 4️⃣ TCG Service (Python)
+  # -----------------------------
+  tcg:
+    image: sakverse/tcg:latest
+    pull_policy: always
+    container_name: tcg
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    depends_on:
+      - knowledgemaster
+      - auth
+    environment:
+      USE_LOCAL_KNOWLEDGE_BASE: true
+      AUTH_URL: "http://auth:8090"
+      Query_URL: "http://knowledgemaster:4444/query"
+      Knowledge_Addition: "http://knowledgemaster:4444/add-knowledge"
+      SECRET_KEY: "mySecretKeymySecretKeymySecretKeymySecretKey"
+      ALGORITHM: "HS256"
+
+      # Database details (for host-installed DB)
+      host: "host.docker.internal"
+      user: "root"
+      password: "admin"
+      database: "tcg"
+      port: "3306"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+
+  unit:
+    image: sakverse/unite:latest
+    pull_policy: always
+    container_name: unite
+    ports:
+      - "6666:6666"
+    restart: unless-stopped
+    depends_on:
+      - tcg
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock   # ✅ FIX
+    environment:
+      LLM_MODEL: "gpt-oss:20b-cloud"
+      OLLAMA_BASE_URL: "http://10.154.2.98:11434"
+      HEADLESS: true
+      SCREENSHOT_DIR: "screenshots"
+      MAX_DOM_CHARS: "80000000"
+      # Database details (for host-installed DB)
+      host: "host.docker.internal"
+      user: "root"
+      password: "admin"
+      database: "automation"
+      port: "3306"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6666/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # -----------------------------
+  # 5️⃣ Node.js Backend Proxy
+  # -----------------------------
+  node-proxy-backend:
+    image: sakverse/backendserver:latest
+    pull_policy: always
+    container_name: node-backend-service
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    depends_on:
+      - tcg
+      - auth
+    environment:
+      PORT: "3000"
+      BASE_IP: "http://tcg:8000"
+      JAVA_IP: "http://auth:8090"
+      NODE_ENV: "production"
+      FRONTEND_URL: "https://tcg.saksoft.com"
+      NGROK_URL: "http://10.154.2.74:6666"
+      FRONTEND_PORT: "5175"
+      HOST: "https://tcg.saksoft.com"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # -----------------------------
+  # 6️⃣ Frontend (Vite)
+  # -----------------------------
+  work-main:
+    image: sakverse/frontend:latest
+    pull_policy: always
+    container_name: work-main-service
+    ports:
+      - "5175:5175"
+    restart: unless-stopped
+    depends_on:
+      - node-proxy-backend
+    environment:
+      VITE_HOST: "tcg.saksoft.com"
+      VITE_FRONTEND_PORT: "5175"
+      VITE_API_URL: "http://tcg.saksoft.com:3000"
+      VITE_BACKEND_PORT: "3000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5175/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5

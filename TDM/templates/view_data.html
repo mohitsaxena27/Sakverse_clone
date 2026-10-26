@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>View Data</title>
+</head>
+<body>
+    <h2>Data List</h2>
+    <ul id="dataList"></ul>
+
+    <script>
+        // Fetch data from the backend and display it
+        fetch("/data-list")
+            .then(response => response.json())
+            .then(data => {
+                const dataList = document.getElementById('dataList');
+                data.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = `ID: ${item.id}, Name: ${item.name}, Age: ${item.age}, Email: ${item.email}`;
+                    dataList.appendChild(li);
+                });
+            });
+    </script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://kit.fontawesome.com/f90b45900e.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <title>TDM Application</title>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+    <h2>Repositories</h2>
+    <ul id="repo-list">
+
+    </ul>
+</div>
+        <div class="content">
+            <div class="button-group">
+                <button id="openrepopopup">Create New Repo</button>
+                <button id="opentablepopup">Create New Table</button>
+
+            </div>
+<!--            <form id="data-form">-->
+<!--                <div class="form-group">-->
+<!--                    <label for="table">Table Name:</label>-->
+<!--                    <input type="text" id="table" name="table" required>-->
+<!--                </div>-->
+<!--                <div class="form-group">-->
+<!--                    <label for="data">Data:</label>-->
+<!--                    <textarea id="data" name="data" required></textarea>-->
+<!--                </div>-->
+<!--                <button type="submit">Submit</button>-->
+<!--            </form>-->
+            <hr>
+<!--            <h2>Uploaded Data</h2>-->
+
+             <div id="tables" class="table-group">
+
+            </div>
+            <hr>
+
+              <div id="grid-container">
+
+              </div>
+
+<!--            <table id="data-grid">-->
+<!--                <thead>-->
+<!--                    <tr>-->
+<!--                        <th>Table Name</th>-->
+<!--                        <th>Data</th>-->
+<!--                    </tr>-->
+<!--                </thead>-->
+<!--                <tbody id="data-list">-->
+<!--                <tr>-->
+<!--                        <td>Table Name</td>-->
+<!--                        <td>Data</td>-->
+<!--                    </tr>-->
+<!--                <tr>-->
+<!--                        <td>Table Name</td>-->
+<!--                        <td>Data</td>-->
+<!--                    </tr>-->
+<!--                </tbody>-->
+<!--            </table>-->
+        </div>
+    </div>
+
+    <div id="repomodel" class="modal">
+        <div class="modal-content">
+            <h3>New Repository</h3>
+            <input type="text" id="textField" placeholder="Enter Repo name">
+            <br><br>
+            <button id="createrepo">Submit</button>
+            <button id="closePopup">Close</button>
+        </div>
+    </div>
+     <div id="tablemodel" class="modal">
+        <div class="modal-content">
+<!--            <form id="dynamic-form" action="/submit_form" method="POST" >-->
+        <!-- Dropdown list will be inserted here -->
+                <label for="repolist">Select a Repo</label>
+                <select id="repolist" name="dropdown_option"></select>
+                <input type="text" id="table_name" placeholder="Enter Table name">
+        <!-- Section to dynamically add columns -->
+                <div id="add-columns-section">
+                    <label for="column-input">Enter column name:</label>
+                    <input type="text" id="column-input" placeholder="Enter column name">
+                    <button id="add-column-btn" type="button">Add New Column</button>
+                </div>
+
+        <!-- Hidden field to store column names in a comma-separated format -->
+                <input type="hidden" id="column-names-input" name="column_names">
+
+        <!-- Column list will be dynamically inserted here -->
+                <ul id="column-list"></ul>
+
+        <!-- Submit button -->
+            <button id="createtable" type="submit">Create Table</button>
+            <button id="closetablePopup">Close</button>
+<!--    </form>-->
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Upload File</h5>
+             </div>
+          <div class="modal-body">
+
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="checkbox" value="checked" id="checkbox">
+                    <label class="form-check-label" for="checkbox">Append</label>
+                </div>
+
+                <!-- File input -->
+                <div class="mb-3">
+                    <label for="dataFile" class="form-label">Select a file to upload</label>
+                    <input type="hidden" name="table_id_dtaupload" id="table_id_dtaupload">
+                    <input class="form-control" type="file" id="dataFile" name="dataFile" required>
+                </div>
+
+                <!-- Submit button -->
+                <button type="submit" class="btn btn-primary" id="uploadtabledata">Submit</button>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">Close</button>
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Message -->
+    <div id="successMessage" style="display:none; color:green;">
+        <h3>Testing</h3>
+    </div>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
