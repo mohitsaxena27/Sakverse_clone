@@ -7,10 +7,10 @@ class AzureDevOpsTestPublisher:
 
     def __init__(self, org_url, project, username, pat):
         """
-       org_url: https://dev.azure.com/ashwanis0547/Demo%20Project
+        org_url: https://dev.azure.com/ashwanis0547/Demo%20Project
         project: Demo Project
         username: ashwanis@saksoft.com
-       
+        """
         self.org_url = org_url.rstrip("/")
         self.project = project
         self.auth = HTTPBasicAuth(username, pat)
